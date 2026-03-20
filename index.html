@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>DOTA 2 MINI - Real-time Strategy MOBA</title>
+    <title>DOTA 2 - Radiant vs Dire | Real MOBA Experience</title>
     <style>
         * {
             margin: 0;
@@ -13,696 +13,554 @@
         }
 
         body {
-            background: #0a0f1e;
+            background: #0a0a1a;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: 'Segoe UI', 'Arial', sans-serif;
+            font-family: 'Segoe UI', 'Arial', 'Courier New', monospace;
             overflow: hidden;
         }
 
-        .game-container {
+        .game-wrapper {
             position: relative;
             display: inline-block;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            border: 3px solid #c9a03d;
+            border-radius: 8px;
         }
 
         canvas {
             display: block;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
             cursor: crosshair;
-            border: 2px solid #e6b422;
         }
 
-        .ui-panel {
+        /* Mini-map */
+        .minimap {
             position: absolute;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
-            border-radius: 12px;
-            padding: 8px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #ffd966;
-            font-weight: bold;
-            font-size: 14px;
-            border: 1px solid #e6b422;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .hero-stats {
-            display: flex;
-            gap: 20px;
-        }
-
-        .hero-stats span {
-            color: white;
-            margin-left: 5px;
-        }
-
-        .inventory {
-            display: flex;
-            gap: 8px;
-            background: rgba(0,0,0,0.6);
-            padding: 5px 10px;
+            bottom: 20px;
+            left: 20px;
+            width: 200px;
+            height: 150px;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid #c9a03d;
             border-radius: 8px;
-            pointer-events: auto;
-        }
-
-        .inv-slot {
-            width: 45px;
-            height: 45px;
-            background: #2a2e3f;
-            border: 1px solid #e6b422;
-            border-radius: 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            cursor: pointer;
-            transition: 0.1s;
-            color: #ffd966;
-            font-weight: bold;
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        .inv-slot:hover {
-            background: #3a3e55;
-            transform: scale(1.05);
-        }
-
-        .inv-slot:active {
-            transform: scale(0.95);
-        }
-
-        .shop {
-            position: absolute;
-            bottom: 80px;
-            right: 10px;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 10px;
-            width: 180px;
-            border: 1px solid #e6b422;
-            pointer-events: auto;
             z-index: 20;
-            font-size: 11px;
+            pointer-events: auto;
+            cursor: pointer;
         }
-
-        .shop h4 {
-            color: #e6b422;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        .shop-item {
-            background: #1e2438;
-            margin: 5px 0;
-            padding: 6px;
+        .minimap canvas {
+            width: 100%;
+            height: 100%;
             border-radius: 6px;
+        }
+
+        /* Shop panel */
+        .shop-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 260px;
+            background: rgba(10,15,30,0.95);
+            backdrop-filter: blur(12px);
+            border: 2px solid #e6b422;
+            border-radius: 12px;
+            padding: 12px;
+            color: #ffd966;
+            font-size: 12px;
+            z-index: 25;
+            pointer-events: auto;
+            font-weight: bold;
+            box-shadow: 0 8px 20px black;
+        }
+        .shop-panel h3 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #ffcc44;
+            font-size: 16px;
+        }
+        .shop-item {
+            background: #1e2a3a;
+            margin: 6px 0;
+            padding: 8px;
+            border-radius: 8px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
-            transition: 0.1s;
+            transition: all 0.1s;
+            border-left: 3px solid #e6b422;
         }
-
         .shop-item:hover {
             background: #e6b422;
-            color: black;
+            color: #0a0f1e;
+            transform: scale(1.02);
         }
-
-        .gold {
-            color: #ffd966;
+        .gold-display {
+            background: #000000aa;
+            padding: 4px 8px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 10px;
             font-size: 18px;
         }
 
-        .kill-counter {
-            color: #ff7777;
+        /* Hero stats panel */
+        .stats-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #e6b422;
+            border-radius: 12px;
+            padding: 8px 15px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 20;
+            backdrop-filter: blur(4px);
+            font-family: monospace;
+        }
+        .stats-panel span {
+            color: #ffaa44;
         }
     </style>
 </head>
 <body>
-<div class="game-container">
-    <canvas id="gameCanvas" width="1200" height="700"></canvas>
-    <div class="ui-panel">
-        <div class="hero-stats">
-            <div>❤️ HP: <span id="hpValue">0</span></div>
-            <div>⚔️ DMG: <span id="dmgValue">0</span></div>
-            <div>🛡️ ARMOR: <span id="armorValue">0</span></div>
-        </div>
-        <div class="gold">💰 GOLD: <span id="goldValue">500</span></div>
-        <div class="kill-counter">💀 KILLS: <span id="killValue">0</span></div>
-        <div class="inventory" id="inventory"></div>
+<div class="game-wrapper">
+    <canvas id="gameCanvas" width="1400" height="800"></canvas>
+    <div class="minimap" id="minimapContainer">
+        <canvas id="minimapCanvas" width="200" height="150"></canvas>
     </div>
-    <div class="shop" id="shopPanel">
-        <h4>🏪 SHOP</h4>
-        <div class="shop-item" data-item="blade">⚔️ Blade of Attack (+12 dmg) - 450g</div>
-        <div class="shop-item" data-item="armor">🛡️ Chainmail (+5 armor) - 550g</div>
-        <div class="shop-item" data-item="health">❤️ Vitality Booster (+200 HP) - 800g</div>
-        <div class="shop-item" data-item="heal">💊 Healing Salve (Heal 150) - 100g</div>
+    <div class="shop-panel" id="shopPanel">
+        <h3>🏪 SECRET SHOP</h3>
+        <div class="gold-display">💰 GOLD: <span id="goldAmount">600</span></div>
+        <div class="shop-item" data-item="power_treads">👢 Power Treads (+12 dmg, +10 aspd) - 950g</div>
+        <div class="shop-item" data-item="blade_mail">🛡️ Blade Mail (reflect 40% dmg) - 1200g</div>
+        <div class="shop-item" data-item="vanguard">❤️ Vanguard (+250 HP, block dmg) - 1500g</div>
+        <div class="shop-item" data-item="desolator">⚔️ Desolator (+50 dmg, -6 armor) - 2100g</div>
+        <div class="shop-item" data-item="healing_potion">💊 Healing Salve (heal 200) - 100g</div>
+    </div>
+    <div class="stats-panel">
+        🧙‍♂️ LUNA | ❤️ <span id="hpVal">0</span>/<span id="maxHpVal">0</span> | ⚔️ DMG: <span id="dmgVal">0</span> | 🛡️ ARMOR: <span id="armorVal">0</span> | 💀 KILLS: <span id="killsVal">0</span>
     </div>
 </div>
 
 <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-
-    // ========== GAME CONSTANTS ==========
-    const W = 1200, H = 700;
+    const minimapCanvas = document.getElementById('minimapCanvas');
+    const miniCtx = minimapCanvas.getContext('2d');
     
-    // ========== HERO CLASS ==========
-    class Hero {
-        constructor(x, y, name) {
-            this.x = x;
-            this.y = y;
-            this.name = name;
-            this.maxHp = 750;
-            this.hp = 750;
-            this.baseDmg = 28;
-            this.dmgBonus = 0;
-            this.armor = 3;
-            this.armorBonus = 0;
-            this.speed = 4.2;
-            this.radius = 24;
-            this.attackRange = 95;
-            this.attackCooldown = 0;
-            this.attackSpeed = 0.65; // seconds per attack
-            this.lastAttack = 0;
-            this.gold = 500;
-            this.kills = 0;
-            this.inventory = [null, null, null];
-        }
-
-        get totalDmg() { return this.baseDmg + this.dmgBonus; }
-        get totalArmor() { return this.armor + this.armorBonus; }
-        
-        takeDamage(amount) {
-            let physReduction = this.totalArmor * 0.06 / (1 + this.totalArmor * 0.06);
-            let dmgTaken = amount * (1 - physReduction);
-            dmgTaken = Math.max(5, dmgTaken);
-            this.hp -= dmgTaken;
-            if(this.hp <= 0) this.hp = 0;
-            return dmgTaken;
-        }
-        
-        addItem(item) {
-            for(let i=0; i<this.inventory.length; i++) {
-                if(this.inventory[i] === null) {
-                    this.inventory[i] = item;
-                    if(item.effect) item.effect(this);
-                    return true;
-                }
-            }
-            return false;
-        }
-        
-        useItem(slot) {
-            let item = this.inventory[slot];
-            if(item && item.use) {
-                let used = item.use(this);
-                if(used) this.inventory[slot] = null;
-            }
-        }
-        
-        attackTarget(target) {
-            let now = performance.now() / 1000;
-            if(now - this.lastAttack < this.attackSpeed) return false;
-            let dx = target.x - this.x;
-            let dy = target.y - this.y;
-            let dist = Math.hypot(dx, dy);
-            if(dist < this.attackRange + target.radius) {
-                let dmg = this.totalDmg + Math.floor(Math.random() * 12);
-                let dealt = target.takeDamage(dmg);
-                this.lastAttack = now;
-                return {dealt, target};
-            }
-            return false;
-        }
-        
-        moveToward(tx, ty, allObstacles) {
-            let dx = tx - this.x;
-            let dy = ty - this.y;
-            let len = Math.hypot(dx, dy);
-            if(len > 1) {
-                let move = Math.min(this.speed, len);
-                let stepX = (dx / len) * move;
-                let stepY = (dy / len) * move;
-                let newX = this.x + stepX;
-                let newY = this.y + stepY;
-                // collision with other units (avoid stacking)
-                let collide = false;
-                for(let u of allObstacles) {
-                    if(u === this) continue;
-                    let d = Math.hypot(newX - u.x, newY - u.y);
-                    if(d < this.radius + u.radius) {
-                        collide = true;
-                        break;
-                    }
-                }
-                if(!collide) {
-                    this.x = newX;
-                    this.y = newY;
-                }
-            }
-        }
-        
-        draw() {
-            ctx.save();
-            ctx.shadowBlur = 0;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
-            ctx.fillStyle = this.name === "Luna" ? "#b87333" : "#4a90e2";
-            ctx.fill();
-            ctx.strokeStyle = "#e6b422";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.fillStyle = "white";
-            ctx.font = "bold 16px Arial";
-            ctx.fillText(this.name, this.x-20, this.y-28);
-            ctx.fillStyle = "#ff5555";
-            ctx.fillRect(this.x-25, this.y-32, 50, 6);
-            ctx.fillStyle = "#55ff55";
-            let hpPercent = this.hp/this.maxHp;
-            ctx.fillRect(this.x-25, this.y-32, 50*hpPercent, 6);
-            ctx.fillStyle = "gold";
-            ctx.font = "12px monospace";
-            ctx.fillText(`⚔️${this.totalDmg} 🛡️${this.totalArmor}`, this.x-22, this.y-38);
-            ctx.restore();
-        }
+    canvas.width = 1400;
+    canvas.height = 800;
+    
+    // ==================== MAP & COLLISION ====================
+    const MAP_W = 1400, MAP_H = 800;
+    
+    // Trees (forest)
+    let trees = [];
+    for(let i = 0; i < 180; i++) {
+        let x = 100 + Math.random() * 500;
+        let y = 100 + Math.random() * 600;
+        if(Math.hypot(x-700, y-400) > 200) trees.push({x, y, r: 14});
+    }
+    for(let i = 0; i < 150; i++) {
+        let x = 800 + Math.random() * 500;
+        let y = 100 + Math.random() * 600;
+        if(Math.hypot(x-700, y-400) > 200) trees.push({x, y, r: 14});
     }
     
-    // ========== CREEP CLASS ==========
-    class Creep {
-        constructor(x, y, team, type) {
-            this.x = x;
-            this.y = y;
-            this.team = team; // "radiant" or "dire"
-            this.type = type;
-            this.maxHp = type === "melee" ? 550 : 400;
-            this.hp = this.maxHp;
-            this.damage = type === "melee" ? 24 : 18;
-            this.radius = 20;
-            this.attackRange = 70;
-            this.attackCooldown = 0;
+    // Towers: Radiant (bottom-left area) and Dire (top-right area)
+    let towers = [
+        { x: 280, y: 620, team: "radiant", hp: 1800, maxHp: 1800, dmg: 65, range: 280, radius: 38, tier: 1 },
+        { x: 480, y: 540, team: "radiant", hp: 1800, maxHp: 1800, dmg: 65, range: 280, radius: 38, tier: 1 },
+        { x: 1100, y: 220, team: "dire", hp: 1800, maxHp: 1800, dmg: 65, range: 280, radius: 38, tier: 1 },
+        { x: 920, y: 300, team: "dire", hp: 1800, maxHp: 1800, dmg: 65, range: 280, radius: 38, tier: 1 },
+        { x: 120, y: 720, team: "radiant", hp: 2800, maxHp: 2800, dmg: 95, range: 320, radius: 48, tier: 2, isAncient: false }, // ancient near
+        { x: 1280, y: 80, team: "dire", hp: 2800, maxHp: 2800, dmg: 95, range: 320, radius: 48, tier: 2, isAncient: false }
+    ];
+    
+    // Throne (Ancient)
+    let radiantThrone = { x: 70, y: 750, team: "radiant", hp: 3200, maxHp: 3200, radius: 55, isThrone: true };
+    let direThrone = { x: 1330, y: 50, team: "dire", hp: 3200, maxHp: 3200, radius: 55, isThrone: true };
+    
+    // ==================== HERO CLASS ====================
+    class Hero {
+        constructor(x, y, name, team, color) {
+            this.x = x; this.y = y; this.name = name; this.team = team;
+            this.maxHp = 780; this.hp = 780;
+            this.baseDmg = 32; this.dmgBonus = 0;
+            this.armor = 4; this.armorBonus = 0;
+            this.speed = 3.8;
+            this.radius = 24;
+            this.attackRange = 130;
+            this.attackCd = 0; this.attackSpeed = 0.65;
             this.lastAttack = 0;
-            this.attackSpeed = 1.0;
-            this.speed = 1.8;
-            this.target = null;
+            this.gold = 600;
+            this.kills = 0;
+            this.items = [];
+            this.color = color;
         }
-        
+        get totalDmg() { return this.baseDmg + this.dmgBonus; }
+        get totalArmor() { return this.armor + this.armorBonus; }
         takeDamage(amount) {
-            this.hp -= amount;
-            return amount;
+            let reduction = this.totalArmor * 0.05 / (1 + this.totalArmor * 0.05);
+            let final = Math.max(8, amount * (1 - reduction));
+            this.hp -= final;
+            if(this.hp <= 0) this.hp = 0;
+            return final;
         }
-        
         attackTarget(target) {
             let now = performance.now() / 1000;
             if(now - this.lastAttack < this.attackSpeed) return false;
             let dist = Math.hypot(this.x - target.x, this.y - target.y);
             if(dist < this.attackRange + target.radius) {
-                let dmg = this.damage + Math.floor(Math.random() * 8);
-                target.takeDamage(dmg);
+                let dmg = this.totalDmg + Math.floor(Math.random() * 12);
+                let dealt = target.takeDamage(dmg);
                 this.lastAttack = now;
                 return true;
             }
             return false;
         }
-        
-        moveToward(target, allUnits) {
-            if(!target) return;
-            let dx = target.x - this.x;
-            let dy = target.y - this.y;
+        moveToward(tx, ty, allObstacles) {
+            let dx = tx - this.x, dy = ty - this.y;
             let len = Math.hypot(dx, dy);
-            if(len > 5) {
-                let move = Math.min(this.speed, len-5);
+            if(len > 2) {
+                let move = Math.min(this.speed, len);
                 let stepX = (dx/len)*move;
                 let stepY = (dy/len)*move;
-                let newX = this.x+stepX;
-                let newY = this.y+stepY;
+                let newX = this.x+stepX, newY = this.y+stepY;
                 let collide = false;
-                for(let u of allUnits) {
-                    if(u===this) continue;
-                    if(Math.hypot(newX-u.x, newY-u.y) < this.radius+u.radius) {
-                        collide=true; break;
-                    }
+                for(let o of allObstacles) {
+                    if(o === this) continue;
+                    if(Math.hypot(newX-o.x, newY-o.y) < this.radius + o.radius) { collide=true; break; }
                 }
-                if(!collide) {
-                    this.x=newX;
-                    this.y=newY;
+                for(let t of trees) {
+                    if(Math.hypot(newX-t.x, newY-t.y) < this.radius + t.r) { collide=true; break; }
                 }
+                if(!collide) { this.x=newX; this.y=newY; }
             }
         }
-        
+        addItem(item) {
+            if(this.items.length < 6) {
+                this.items.push(item);
+                if(item.effect) item.effect(this);
+                return true;
+            }
+            return false;
+        }
+        draw() {
+            ctx.shadowBlur = 0;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            ctx.strokeStyle = "#e6b422";
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            ctx.fillStyle = "white";
+            ctx.font = "bold 14px Arial";
+            ctx.fillText(this.name, this.x-20, this.y-28);
+            ctx.fillStyle = "#ff5555";
+            ctx.fillRect(this.x-28, this.y-34, 56, 7);
+            ctx.fillStyle = "#55ff55";
+            ctx.fillRect(this.x-28, this.y-34, 56*(this.hp/this.maxHp), 7);
+        }
+    }
+    
+    // ==================== CREEPS ====================
+    class Creep {
+        constructor(x, y, team, type) {
+            this.x=x; this.y=y; this.team=team;
+            this.type=type;
+            this.maxHp = type==="melee"? 550 : 420;
+            this.hp = this.maxHp;
+            this.dmg = type==="melee"? 26 : 20;
+            this.radius = 20;
+            this.attackRange = 75;
+            this.lastAttack=0;
+            this.attackSpeed=1.0;
+            this.speed=1.8;
+        }
+        takeDamage(amount) { this.hp-=amount; return amount; }
+        attackTarget(target) {
+            let now=performance.now()/1000;
+            if(now-this.lastAttack<this.attackSpeed) return false;
+            let dist=Math.hypot(this.x-target.x, this.y-target.y);
+            if(dist<this.attackRange+target.radius) {
+                target.takeDamage(this.dmg+Math.random()*8);
+                this.lastAttack=now;
+                return true;
+            }
+            return false;
+        }
+        moveToward(target, allUnits) {
+            if(!target) return;
+            let dx=target.x-this.x, dy=target.y-this.y;
+            let len=Math.hypot(dx,dy);
+            if(len>5) {
+                let move=Math.min(this.speed, len-3);
+                let stepX=(dx/len)*move, stepY=(dy/len)*move;
+                let newX=this.x+stepX, newY=this.y+stepY;
+                let collide=false;
+                for(let u of allUnits) if(u!==this && Math.hypot(newX-u.x,newY-u.y)<this.radius+u.radius) collide=true;
+                for(let t of trees) if(Math.hypot(newX-t.x,newY-t.y)<this.radius+t.r) collide=true;
+                if(!collide) { this.x=newX; this.y=newY; }
+            }
+        }
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
-            ctx.fillStyle = this.team === "radiant" ? "#6fbf4c" : "#b84c4c";
+            ctx.fillStyle = this.team==="radiant" ? "#6aab4a" : "#b85c5c";
             ctx.fill();
-            ctx.strokeStyle = "#333";
+            ctx.strokeStyle="#222";
             ctx.stroke();
-            ctx.fillStyle = "white";
-            ctx.font = "10px Arial";
-            ctx.fillText(this.type==="melee"?"👊":"🏹", this.x-8, this.y-8);
-            ctx.fillStyle = "#ff8888";
+            ctx.fillStyle="white";
+            ctx.font="10px Arial";
+            ctx.fillText(this.type==="melee"?"⚔️":"🏹", this.x-8, this.y-8);
+            ctx.fillStyle="red";
             ctx.fillRect(this.x-15, this.y-18, 30, 4);
-            ctx.fillStyle = "#88ff88";
+            ctx.fillStyle="lime";
             ctx.fillRect(this.x-15, this.y-18, 30*(this.hp/this.maxHp), 4);
         }
     }
     
-    // ========== ITEMS ==========
+    // ==================== GLOBAL OBJECTS ====================
+    let hero = new Hero(300, 680, "LUNA", "radiant", "#b87c4f");
+    let enemies = [new Hero(1150, 120, "ZEUS", "dire", "#6c5c9c")];
+    enemies[0].maxHp=720; enemies[0].hp=720;
+    let creeps = [];
+    let spawnTimer=0;
+    let mouseX=hero.x, mouseY=hero.y;
+    let isMoving=false;
+    
+    // items database
     const itemsDB = {
-        blade: { name:"Blade", effect:(h)=> h.dmgBonus+=12, desc:"+12 dmg" },
-        armor: { name:"Armor", effect:(h)=> h.armorBonus+=5, desc:"+5 armor" },
-        health: { name:"Vitality", effect:(h)=> { h.maxHp+=200; h.hp+=200; }, desc:"+200 HP" },
-        heal: { name:"Salve", use:(h)=> { if(h.hp+150 <= h.maxHp) h.hp+=150; else h.hp=h.maxHp; return true; }, desc:"Heal 150" }
+        power_treads: { name:"Power Treads", effect:(h)=>{ h.dmgBonus+=12; h.speed+=0.3; }, desc:"+12 dmg +aspd" },
+        blade_mail: { name:"Blade Mail", effect:(h)=>{ h.bladeMail=true; }, desc:"Reflect" },
+        vanguard: { name:"Vanguard", effect:(h)=>{ h.maxHp+=250; h.hp+=250; h.block=true; }, desc:"+250 HP" },
+        desolator: { name:"Desolator", effect:(h)=>{ h.dmgBonus+=50; h.desolator=true; }, desc:"+50 dmg" },
+        healing_potion: { name:"Salve", use:(h)=>{ h.hp=Math.min(h.maxHp, h.hp+200); return true; }, desc:"heal 200" }
     };
     
-    // ========== GLOBAL STATE ==========
-    let hero = new Hero(W/2, H/2, "Luna");
-    let enemies = []; // bot heroes
-    let creeps = [];
-    let gameTime = 0;
-    let spawnCounter = 0;
-    let mouseX = hero.x, mouseY = hero.y;
-    let rightClick = false;
+    function spawnCreepWave() {
+        creeps.push(new Creep(180, 660, "radiant", "melee"));
+        creeps.push(new Creep(220, 640, "radiant", "ranged"));
+        creeps.push(new Creep(1240, 100, "dire", "melee"));
+        creeps.push(new Creep(1200, 130, "dire", "ranged"));
+        if(Math.random()<0.4) creeps.push(new Creep(210, 650, "radiant", "melee"));
+        if(Math.random()<0.4) creeps.push(new Creep(1220, 110, "dire", "melee"));
+    }
     
-    // enemy bots: Zeus
-    let enemyHero = new Hero(1000, 500, "Zeus");
-    enemyHero.maxHp = 720;
-    enemyHero.hp = 720;
-    enemyHero.baseDmg = 30;
-    enemyHero.team = "dire";
-    enemies.push(enemyHero);
+    // AI for enemy hero
+    function updateEnemyAI() {
+        for(let e of enemies) {
+            let distToHero = Math.hypot(e.x-hero.x, e.y-hero.y);
+            let all = [hero, ...enemies, ...creeps];
+            if(distToHero < 320) {
+                e.moveToward(hero.x, hero.y, all);
+                e.attackTarget(hero);
+            } else {
+                let targetCreep = creeps.find(c=>c.team==="radiant" && Math.hypot(c.x-e.x, c.y-e.y)<500);
+                if(targetCreep) e.moveToward(targetCreep.x, targetCreep.y, all);
+                else e.moveToward(500, 550, all);
+                for(let c of creeps) if(c.team==="radiant" && Math.hypot(e.x-c.x, e.y-c.y)<e.attackRange+20) e.attackTarget(c);
+            }
+            // attack towers
+            for(let tow of towers) if(tow.team!==e.team && Math.hypot(e.x-tow.x, e.y-tow.y)<e.attackRange+40) e.attackTarget(tow);
+            if(radiantThrone.team!==e.team && Math.hypot(e.x-radiantThrone.x, e.y-radiantThrone.y)<e.attackRange+50) e.attackTarget(radiantThrone);
+        }
+    }
     
-    // second bot: Juggernaut
-    let enemyHero2 = new Hero(1050, 350, "Juggernaut");
-    enemyHero2.maxHp = 780;
-    enemyHero2.hp = 780;
-    enemyHero2.baseDmg = 32;
-    enemyHero2.team = "dire";
-    enemies.push(enemyHero2);
+    function updateCreepsAI() {
+        for(let c of creeps) {
+            let target=null;
+            if(c.team==="radiant") {
+                let enemiesNear = [...enemies, ...creeps.filter(cr=>cr.team==="dire")];
+                let closest=null, minD=999;
+                for(let t of enemiesNear) { let d=Math.hypot(c.x-t.x, c.y-t.y); if(d<minD){minD=d; closest=t;} }
+                if(!closest) { let towerTarget = towers.find(t=>t.team==="dire"); if(towerTarget) closest=towerTarget; }
+                if(!closest && direThrone) closest=direThrone;
+                target=closest;
+            } else {
+                let enemiesNear = [hero, ...creeps.filter(cr=>cr.team==="radiant")];
+                let closest=null, minD=999;
+                for(let t of enemiesNear) { let d=Math.hypot(c.x-t.x, c.y-t.y); if(d<minD){minD=d; closest=t;} }
+                if(!closest) { let towerTarget = towers.find(t=>t.team==="radiant"); if(towerTarget) closest=towerTarget; }
+                if(!closest && radiantThrone) closest=radiantThrone;
+                target=closest;
+            }
+            if(target) {
+                let allUnits = [hero, ...enemies, ...creeps];
+                c.moveToward(target, allUnits);
+                c.attackTarget(target);
+            }
+        }
+    }
     
-    // ========== HELPER FUNCTIONS ==========
-    function spawnCreeps() {
-        creeps.push(new Creep(200, 200, "radiant", "melee"));
-        creeps.push(new Creep(230, 270, "radiant", "ranged"));
-        creeps.push(new Creep(1000, 550, "dire", "melee"));
-        creeps.push(new Creep(1050, 600, "dire", "ranged"));
-        creeps.push(new Creep(970, 500, "dire", "melee"));
-        creeps.push(new Creep(180, 150, "radiant", "melee"));
+    function updateTowerAttacks() {
+        for(let tow of towers) {
+            if(tow.hp<=0) continue;
+            let target=null;
+            if(tow.team==="radiant") target = [...enemies, ...creeps.filter(c=>c.team==="dire")].find(u=>Math.hypot(tow.x-u.x, tow.y-u.y)<tow.range);
+            else target = [hero, ...creeps.filter(c=>c.team==="radiant")].find(u=>Math.hypot(tow.x-u.x, tow.y-u.y)<tow.range);
+            if(target) {
+                if(!tow.lastShot || performance.now()/1000 - tow.lastShot > 1.1) {
+                    target.takeDamage(tow.dmg);
+                    tow.lastShot = performance.now()/1000;
+                }
+            }
+        }
+        // throne attacks
+        if(radiantThrone.hp>0) {
+            let target = [...enemies, ...creeps.filter(c=>c.team==="dire")].find(u=>Math.hypot(radiantThrone.x-u.x, radiantThrone.y-u.y)<280);
+            if(target && (!radiantThrone.lastShot || performance.now()/1000 - radiantThrone.lastShot > 1.2)) {
+                target.takeDamage(70);
+                radiantThrone.lastShot = performance.now()/1000;
+            }
+        }
+        if(direThrone.hp>0) {
+            let target = [hero, ...creeps.filter(c=>c.team==="radiant")].find(u=>Math.hypot(direThrone.x-u.x, direThrone.y-u.y)<280);
+            if(target && (!direThrone.lastShot || performance.now()/1000 - direThrone.lastShot > 1.2)) {
+                target.takeDamage(70);
+                direThrone.lastShot = performance.now()/1000;
+            }
+        }
+    }
+    
+    function handleDeathsAndGold() {
+        for(let i=0;i<creeps.length;i++) {
+            let c=creeps[i];
+            if(c.hp<=0) {
+                if(Math.hypot(hero.x-c.x, hero.y-c.y)<200) { hero.gold += (c.type==="melee"?48:38); }
+                creeps.splice(i,1); i--;
+            }
+        }
+        for(let i=0;i<enemies.length;i++) {
+            let e=enemies[i];
+            if(e.hp<=0) {
+                if(Math.hypot(hero.x-e.x, hero.y-e.y)<250) { hero.gold+=180; hero.kills++; }
+                e.hp=e.maxHp; e.x=1200+Math.random()*100; e.y=80+Math.random()*80;
+            }
+        }
+        for(let i=0;i<towers.length;i++) {
+            let t=towers[i];
+            if(t.hp<=0 && !t.destroyed) { t.destroyed=true; hero.gold+=250; }
+        }
+        if(hero.hp<=0) { hero.hp=hero.maxHp; hero.x=250; hero.y=700; hero.gold=Math.max(0, hero.gold-100); }
+    }
+    
+    function updateMovement() {
+        let allUnits = [hero, ...enemies, ...creeps];
+        if(isMoving) hero.moveToward(mouseX, mouseY, allUnits);
+    }
+    
+    // ==================== DRAW MAP & UI ====================
+    function drawMap() {
+        ctx.fillStyle = "#2c5a2c";
+        ctx.fillRect(0,0,MAP_W,MAP_H);
+        ctx.fillStyle = "#5a3a1a";
+        for(let t of trees) { ctx.beginPath(); ctx.arc(t.x,t.y,t.r,0,Math.PI*2); ctx.fill(); ctx.fillStyle="#3a2a0a"; ctx.fill(); ctx.fillStyle="#5a3a1a"; }
+        ctx.fillStyle = "#8b6946";
+        ctx.font="bold 24px Arial";
+        ctx.fillText("⚔️ RADIANT", 40, 60);
+        ctx.fillStyle = "#a55a5a";
+        ctx.fillText("💀 DIRE", 1200, 100);
+        // draw towers
+        for(let t of towers) {
+            ctx.fillStyle = t.team==="radiant" ? "#c9a87b" : "#8b4c4c";
+            ctx.beginPath(); ctx.arc(t.x,t.y,t.radius-6,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle="white"; ctx.fillText("🏰", t.x-12, t.y-8);
+            ctx.fillStyle="#ff6666"; ctx.fillRect(t.x-25, t.y-38, 50, 6);
+            ctx.fillStyle="#66ff66"; ctx.fillRect(t.x-25, t.y-38, 50*(t.hp/t.maxHp), 6);
+        }
+        // throne
+        ctx.fillStyle="#d4af37"; ctx.beginPath(); ctx.arc(radiantThrone.x,radiantThrone.y,radiantThrone.radius,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="gold"; ctx.fillText("👑", radiantThrone.x-12, radiantThrone.y-8);
+        ctx.fillStyle="#d4af37"; ctx.beginPath(); ctx.arc(direThrone.x,direThrone.y,direThrone.radius,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="gold"; ctx.fillText("👑", direThrone.x-12, direThrone.y-8);
+    }
+    
+    function drawMinimap() {
+        miniCtx.fillStyle="#1e3a1e"; miniCtx.fillRect(0,0,200,150);
+        for(let t of trees) { miniCtx.fillStyle="#2a4a1a"; miniCtx.fillRect(t.x/7, t.y/5.33, 2,2); }
+        for(let t of towers) { miniCtx.fillStyle=t.team==="radiant"?"#ffaa66":"#ff6666"; miniCtx.fillRect(t.x/7-2, t.y/5.33-2, 4,4); }
+        miniCtx.fillStyle="#ff5555"; miniCtx.fillRect(hero.x/7-2, hero.y/5.33-2, 5,5);
+        for(let e of enemies) { miniCtx.fillStyle="#aa5555"; miniCtx.fillRect(e.x/7-2, e.y/5.33-2, 4,4); }
     }
     
     function updateUI() {
-        document.getElementById("hpValue").innerText = Math.floor(hero.hp)+"/"+hero.maxHp;
-        document.getElementById("dmgValue").innerText = hero.totalDmg;
-        document.getElementById("armorValue").innerText = hero.totalArmor;
-        document.getElementById("goldValue").innerText = Math.floor(hero.gold);
-        document.getElementById("killValue").innerText = hero.kills;
-        
-        let invDiv = document.getElementById("inventory");
-        invDiv.innerHTML = "";
-        for(let i=0; i<hero.inventory.length; i++) {
-            let item = hero.inventory[i];
-            let slotDiv = document.createElement("div");
-            slotDiv.className = "inv-slot";
-            slotDiv.innerText = item ? item.name : "Empty";
-            slotDiv.onclick = (function(idx){ return function(){ hero.useItem(idx); updateUI(); }; })(i);
-            invDiv.appendChild(slotDiv);
-        }
+        document.getElementById('hpVal').innerText = Math.floor(hero.hp);
+        document.getElementById('maxHpVal').innerText = hero.maxHp;
+        document.getElementById('dmgVal').innerText = hero.totalDmg;
+        document.getElementById('armorVal').innerText = hero.totalArmor;
+        document.getElementById('killsVal').innerText = hero.kills;
+        document.getElementById('goldAmount').innerText = Math.floor(hero.gold);
     }
     
-    // AI for enemy heroes
-    function updateEnemyAI() {
-        for(let e of enemies) {
-            let distToHero = Math.hypot(e.x - hero.x, e.y - hero.y);
-            if(distToHero < 280) {
-                e.moveToward(hero.x, hero.y, [...enemies, hero, ...creeps]);
-                let attack = e.attackTarget(hero);
-                if(attack && hero.hp <= 0) {
-                    // hero dead
-                }
-            } else {
-                // patrol / move toward lane
-                let targetCreep = creeps.find(c => c.team === "radiant" && Math.hypot(c.x-e.x, c.y-e.y) < 400);
-                if(targetCreep) e.moveToward(targetCreep.x, targetCreep.y, [...enemies, hero, ...creeps]);
-                else e.moveToward(400, 350, [...enemies, hero, ...creeps]);
-            }
-            // attack creeps
-            for(let c of creeps) {
-                if(c.team !== e.team && Math.hypot(e.x-c.x, e.y-c.y) < e.attackRange+20) {
-                    e.attackTarget(c);
-                    break;
-                }
-            }
-        }
-    }
-    
-    function updateCreeps() {
-        for(let i=0; i<creeps.length; i++) {
-            let c = creeps[i];
-            let target = null;
-            if(c.team === "radiant") {
-                // find nearest dire unit
-                let enemiesNear = [...enemies, ...creeps.filter(cr=>cr.team==="dire")];
-                let closest = null;
-                let minDist = 500;
-                for(let t of enemiesNear) {
-                    let d = Math.hypot(c.x-t.x, c.y-t.y);
-                    if(d < minDist) { minDist=d; closest=t; }
-                }
-                target = closest;
-            } else {
-                let enemiesNear = [hero, ...creeps.filter(cr=>cr.team==="radiant")];
-                let closest = null;
-                let minDist = 500;
-                for(let t of enemiesNear) {
-                    let d = Math.hypot(c.x-t.x, c.y-t.y);
-                    if(d < minDist) { minDist=d; closest=t; }
-                }
-                target = closest;
-            }
-            if(target) {
-                c.moveToward(target, [...creeps, hero, ...enemies]);
-                c.attackTarget(target);
-            } else {
-                // move towards enemy base
-                if(c.team === "radiant") c.moveToward(900, 500, [...creeps, hero, ...enemies]);
-                else c.moveToward(300, 300, [...creeps, hero, ...enemies]);
-            }
-        }
-    }
-    
-    function handleCombatAndGold() {
-        // hero attacks with mouse click
-        if(rightClick) {
-            let closestEnemy = null;
-            let minD = hero.attackRange+30;
-            for(let e of enemies) {
-                let d = Math.hypot(hero.x-e.x, hero.y-e.y);
-                if(d < minD) { minD = d; closestEnemy = e; }
-            }
-            for(let c of creeps) {
-                if(c.team !== "radiant") {
-                    let d = Math.hypot(hero.x-c.x, hero.y-c.y);
-                    if(d < minD) { minD = d; closestEnemy = c; }
-                }
-            }
-            if(closestEnemy) hero.attackTarget(closestEnemy);
-            rightClick = false;
-        }
-        
-        // creep death & gold
-        for(let i=0; i<creeps.length; i++) {
-            let c = creeps[i];
-            if(c.hp <= 0) {
-                let killer = null;
-                if(Math.hypot(hero.x-c.x, hero.y-c.y) < 150) killer = hero;
-                for(let e of enemies) if(Math.hypot(e.x-c.x, e.y-c.y) < 150) killer = e;
-                if(killer === hero) {
-                    hero.gold += (c.type==="melee"? 45 : 35);
-                    updateUI();
-                }
-                creeps.splice(i,1);
-                i--;
-            }
-        }
-        // enemy hero death
-        for(let i=0; i<enemies.length; i++) {
-            let e = enemies[i];
-            if(e.hp <= 0) {
-                if(Math.hypot(hero.x-e.x, hero.y-e.y) < 200) {
-                    hero.gold += 220;
-                    hero.kills++;
-                    updateUI();
-                }
-                e.hp = e.maxHp;
-                e.x = 1050 + Math.random()*100;
-                e.y = 400 + Math.random()*200;
-            }
-        }
-        if(hero.hp <= 0) {
-            hero.hp = hero.maxHp;
-            hero.x = 300;
-            hero.y = 350;
-            hero.gold = Math.max(0, hero.gold-100);
-            updateUI();
-        }
-    }
-    
-    function spawnWaveTimer() {
-        spawnCounter++;
-        if(spawnCounter > 300) { // every ~5 seconds at 60fps
-            creeps.push(new Creep(180, 220, "radiant", "melee"));
-            creeps.push(new Creep(220, 280, "radiant", "ranged"));
-            creeps.push(new Creep(1050, 530, "dire", "melee"));
-            creeps.push(new Creep(1010, 580, "dire", "ranged"));
-            spawnCounter = 0;
-        }
-    }
-    
-    // ========== DRAW ==========
-    function drawBackground() {
-        ctx.fillStyle = "#2a5730";
-        ctx.fillRect(0,0,W,H);
-        // lane lines
-        ctx.strokeStyle = "#b8860b";
-        ctx.lineWidth = 6;
-        ctx.beginPath();
-        ctx.moveTo(0, H/2);
-        ctx.lineTo(W, H/2);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(W/2, 0);
-        ctx.lineTo(W/2, H);
-        ctx.stroke();
-        ctx.fillStyle = "#8b5a2b";
-        ctx.font = "bold 20px Arial";
-        ctx.fillText("🌳 RADIANT BASE", 30, 60);
-        ctx.fillStyle = "#5a2b2b";
-        ctx.fillText("💀 DIRE BASE", W-200, H-40);
-    }
-    
-    function draw() {
-        drawBackground();
-        hero.draw();
-        for(let e of enemies) e.draw();
-        for(let c of creeps) c.draw();
-        
-        // attack range indicator on hover? 
-        ctx.beginPath();
-        ctx.arc(hero.x, hero.y, hero.attackRange, 0, Math.PI*2);
-        ctx.strokeStyle = "#e6b42266";
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        
-        // mouse target circle
-        ctx.beginPath();
-        ctx.arc(mouseX, mouseY, 12, 0, Math.PI*2);
-        ctx.fillStyle = "#ffaa33aa";
-        ctx.fill();
-    }
-    
-    // ========== GAME LOOP ==========
-    function updateGame() {
-        // move hero towards mouse on right click (handled via canvas event)
-        let allUnits = [hero, ...enemies, ...creeps];
-        hero.moveToward(mouseX, mouseY, allUnits);
+    // ==================== GAME LOOP ====================
+    function gameUpdate() {
+        updateMovement();
         updateEnemyAI();
-        updateCreeps();
-        handleCombatAndGold();
-        spawnWaveTimer();
+        updateCreepsAI();
+        updateTowerAttacks();
+        handleDeathsAndGold();
+        spawnTimer++;
+        if(spawnTimer>240) { spawnCreepWave(); spawnTimer=0; }
         updateUI();
     }
     
-    function gameLoop() {
-        updateGame();
-        draw();
-        requestAnimationFrame(gameLoop);
+    function render() {
+        drawMap();
+        for(let c of creeps) c.draw();
+        for(let t of towers) if(t.hp>0) { ctx.fillStyle=t.team==="radiant"?"#c9a87b":"#8b4c4c"; ctx.beginPath(); ctx.arc(t.x,t.y,t.radius-6,0,Math.PI*2); ctx.fill(); ctx.fillStyle="white"; ctx.fillText("🏰", t.x-12, t.y-8); ctx.fillStyle="#ff6666"; ctx.fillRect(t.x-25, t.y-38, 50, 6); ctx.fillStyle="#66ff66"; ctx.fillRect(t.x-25, t.y-38, 50*(t.hp/t.maxHp), 6); }
+        if(radiantThrone.hp>0){ ctx.fillStyle="#d4af37"; ctx.beginPath(); ctx.arc(radiantThrone.x,radiantThrone.y,radiantThrone.radius,0,Math.PI*2); ctx.fill(); ctx.fillStyle="gold"; ctx.fillText("👑", radiantThrone.x-12, radiantThrone.y-8); }
+        if(direThrone.hp>0){ ctx.fillStyle="#d4af37"; ctx.beginPath(); ctx.arc(direThrone.x,direThrone.y,direThrone.radius,0,Math.PI*2); ctx.fill(); ctx.fillStyle="gold"; ctx.fillText("👑", direThrone.x-12, direThrone.y-8); }
+        hero.draw();
+        for(let e of enemies) e.draw();
+        drawMinimap();
     }
     
-    // ========== EVENT HANDLERS ==========
+    function animate() {
+        gameUpdate();
+        render();
+        requestAnimationFrame(animate);
+    }
+    
+    // ==================== CONTROLS ====================
     canvas.addEventListener("mousemove", (e) => {
-        let rect = canvas.getBoundingClientRect();
-        let scaleX = canvas.width/rect.width;
-        let scaleY = canvas.height/rect.height;
-        let canvasX = (e.clientX - rect.left) * scaleX;
-        let canvasY = (e.clientY - rect.top) * scaleY;
-        mouseX = Math.min(W-20, Math.max(20, canvasX));
-        mouseY = Math.min(H-20, Math.max(20, canvasY));
+        let rect=canvas.getBoundingClientRect();
+        let sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+        let cx=(e.clientX-rect.left)*sx, cy=(e.clientY-rect.top)*sy;
+        mouseX=Math.min(MAP_W-30, Math.max(30, cx));
+        mouseY=Math.min(MAP_H-30, Math.max(30, cy));
     });
-    
-    canvas.addEventListener("click", (e) => {
-        let rect = canvas.getBoundingClientRect();
-        let scaleX = canvas.width/rect.width;
-        let scaleY = canvas.height/rect.height;
-        let canvasX = (e.clientX - rect.left) * scaleX;
-        let canvasY = (e.clientY - rect.top) * scaleY;
-        // check for attack
-        let attacked = false;
-        for(let i=0; i<enemies.length; i++) {
-            let en = enemies[i];
-            let d = Math.hypot(canvasX-en.x, canvasY-en.y);
-            if(d < en.radius+10) {
-                hero.attackTarget(en);
-                attacked = true;
-                break;
-            }
-        }
-        if(!attacked) {
-            for(let c of creeps) {
-                if(c.team !== "radiant") {
-                    let d = Math.hypot(canvasX-c.x, canvasY-c.y);
-                    if(d < c.radius+10) {
-                        hero.attackTarget(c);
-                        break;
-                    }
-                }
-            }
-        }
-    });
-    
-    canvas.addEventListener("contextmenu", (e) => {
-        e.preventDefault();
-        let rect = canvas.getBoundingClientRect();
-        let scaleX = canvas.width/rect.width;
-        let scaleY = canvas.height/rect.height;
-        let canvasX = (e.clientX - rect.left) * scaleX;
-        let canvasY = (e.clientY - rect.top) * scaleY;
-        mouseX = Math.min(W-20, Math.max(20, canvasX));
-        mouseY = Math.min(H-20, Math.max(20, canvasY));
-        rightClick = true;
-        return false;
-    });
-    
-    // shop handlers
-    document.querySelectorAll(".shop-item").forEach(el => {
-        el.addEventListener("click", () => {
-            let itemId = el.getAttribute("data-item");
-            let item = itemsDB[itemId];
-            let cost = { blade:450, armor:550, health:800, heal:100 }[itemId];
-            if(hero.gold >= cost) {
-                hero.gold -= cost;
-                let newItem = { name: item.name, effect: item.effect, use: item.use };
-                if(itemId === "heal") newItem = { name: item.name, use: item.use };
-                else newItem.effect = item.effect;
-                hero.addItem(newItem);
+    canvas.addEventListener("click", (e) => { isMoving=true; });
+    canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); isMoving=true; return false; });
+    document.querySelectorAll(".shop-item").forEach(el=>{
+        el.addEventListener("click",()=>{
+            let id=el.getAttribute("data-item");
+            let item=itemsDB[id];
+            let cost={power_treads:950, blade_mail:1200, vanguard:1500, desolator:2100, healing_potion:100}[id];
+            if(hero.gold>=cost){
+                hero.gold-=cost;
+                if(item.use) hero.addItem({name:item.name, use:item.use});
+                else hero.addItem({name:item.name, effect:item.effect});
                 updateUI();
             }
         });
     });
+    minimapCanvas.addEventListener("click", (e)=>{
+        let rect=minimapCanvas.getBoundingClientRect();
+        let rx=(e.clientX-rect.left)/rect.width*200;
+        let ry=(e.clientY-rect.top)/rect.height*150;
+        hero.x=Math.min(MAP_W-40, Math.max(40, rx*7));
+        hero.y=Math.min(MAP_H-40, Math.max(40, ry*5.33));
+        isMoving=true;
+    });
     
-    // initial spawn
-    spawnCreeps();
-    updateUI();
-    gameLoop();
+    spawnCreepWave();
+    animate();
 </script>
 </body>
 </html>
