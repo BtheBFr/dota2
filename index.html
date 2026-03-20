@@ -2,413 +2,707 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Dota 2 Encyclopedia — Heroes & Items</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>DOTA 2 MINI - Real-time Strategy MOBA</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
         }
 
         body {
-            background: #0a0e1a;
-            font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
-            color: #eef2ff;
-            line-height: 1.45;
-            padding: 1.5rem;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .header h1 {
-            font-size: 2.8rem;
-            background: linear-gradient(135deg, #e6b422, #c97e1a);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            letter-spacing: -0.5px;
-            margin-bottom: 0.5rem;
-        }
-        .header p {
-            color: #8e9aaf;
-            font-size: 1.1rem;
-        }
-
-        /* Tabs */
-        .tabs {
+            background: #0a0f1e;
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        .tab-btn {
-            background: #1e2438;
-            border: none;
-            padding: 0.7rem 2rem;
-            font-size: 1.2rem;
-            font-weight: 600;
-            border-radius: 40px;
-            color: #b9c2db;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: inherit;
-        }
-        .tab-btn.active {
-            background: #e6b422;
-            color: #0a0e1a;
-            box-shadow: 0 4px 12px rgba(230,180,34,0.3);
-        }
-        .tab-btn:hover:not(.active) {
-            background: #2f3a54;
-            color: #ffffff;
-        }
-
-        /* Content panels */
-        .panel {
-            display: none;
-            animation: fade 0.25s ease;
-        }
-        .panel.active-panel {
-            display: block;
-        }
-        @keyframes fade {
-            from { opacity: 0; transform: translateY(6px);}
-            to { opacity: 1; transform: translateY(0);}
-        }
-
-        /* Grids */
-        .heroes-grid, .items-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.8rem;
-        }
-
-        /* Hero card */
-        .hero-card {
-            background: #131825;
-            border-radius: 28px;
-            overflow: hidden;
-            border: 1px solid #2a3246;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
-        .hero-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 18px 30px rgba(0,0,0,0.4);
-            border-color: #e6b42260;
-        }
-        .hero-header {
-            background: #0f1420;
-            padding: 1.2rem 1.5rem;
-            border-bottom: 1px solid #2a3246;
-        }
-        .hero-name {
-            font-size: 1.8rem;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .hero-name span {
-            background: #e6b42220;
-            color: #e6b422;
-            font-size: 0.8rem;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-weight: normal;
-        }
-        .hero-stats {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
-            font-size: 0.85rem;
-            color: #9aa3bf;
-        }
-        .skills-section {
-            padding: 1.2rem 1.5rem 1.5rem;
-        }
-        .skill {
-            margin-bottom: 1rem;
-            border-left: 3px solid #e6b422;
-            padding-left: 0.9rem;
-        }
-        .skill-name {
-            font-weight: 700;
-            color: #ffdd88;
-            display: flex;
             align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .skill-desc {
-            font-size: 0.85rem;
-            color: #cbd5ff;
-            margin-top: 4px;
-        }
-        .skill-mana {
-            font-size: 0.7rem;
-            color: #6c86b0;
-            font-family: monospace;
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            overflow: hidden;
         }
 
-        /* Items grid */
-        .item-card {
-            background: #131825;
-            border-radius: 24px;
-            padding: 1.2rem 1.5rem;
-            border: 1px solid #2a3246;
-            transition: 0.2s;
+        .game-container {
+            position: relative;
+            display: inline-block;
         }
-        .item-card:hover {
-            border-color: #e6b422;
-            background: #171e2c;
+
+        canvas {
+            display: block;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            cursor: crosshair;
+            border: 2px solid #e6b422;
         }
-        .item-name {
-            font-size: 1.4rem;
-            font-weight: 700;
+
+        .ui-panel {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 8px 15px;
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-        }
-        .item-cost {
-            color: #e6b422;
-            font-size: 1rem;
-            font-weight: 500;
-        }
-        .item-desc {
-            margin-top: 0.7rem;
-            color: #cbd5ff;
-            font-size: 0.9rem;
-        }
-        .item-attr {
-            margin-top: 0.6rem;
-            font-size: 0.75rem;
-            color: #7e8bb0;
-            border-top: 1px solid #262e44;
-            padding-top: 0.6rem;
+            align-items: center;
+            color: #ffd966;
+            font-weight: bold;
+            font-size: 14px;
+            border: 1px solid #e6b422;
+            pointer-events: none;
+            z-index: 10;
         }
 
-        .section-title {
-            font-size: 1.6rem;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-            border-left: 4px solid #e6b422;
-            padding-left: 1rem;
+        .hero-stats {
+            display: flex;
+            gap: 20px;
         }
-        footer {
+
+        .hero-stats span {
+            color: white;
+            margin-left: 5px;
+        }
+
+        .inventory {
+            display: flex;
+            gap: 8px;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 10px;
+            border-radius: 8px;
+            pointer-events: auto;
+        }
+
+        .inv-slot {
+            width: 45px;
+            height: 45px;
+            background: #2a2e3f;
+            border: 1px solid #e6b422;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            transition: 0.1s;
+            color: #ffd966;
+            font-weight: bold;
             text-align: center;
-            margin-top: 3rem;
-            padding: 1.5rem;
-            color: #5f6c8f;
-            font-size: 0.8rem;
-            border-top: 1px solid #1e2438;
+            line-height: 1.2;
         }
-        @media (max-width: 700px) {
-            body { padding: 1rem; }
-            .hero-name { font-size: 1.4rem; }
-            .heroes-grid, .items-grid { grid-template-columns: 1fr; }
+
+        .inv-slot:hover {
+            background: #3a3e55;
+            transform: scale(1.05);
         }
-        .badge {
+
+        .inv-slot:active {
+            transform: scale(0.95);
+        }
+
+        .shop {
+            position: absolute;
+            bottom: 80px;
+            right: 10px;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 10px;
+            width: 180px;
+            border: 1px solid #e6b422;
+            pointer-events: auto;
+            z-index: 20;
+            font-size: 11px;
+        }
+
+        .shop h4 {
+            color: #e6b422;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .shop-item {
             background: #1e2438;
-            border-radius: 20px;
-            padding: 0.2rem 0.6rem;
-            font-size: 0.7rem;
+            margin: 5px 0;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            transition: 0.1s;
+        }
+
+        .shop-item:hover {
+            background: #e6b422;
+            color: black;
+        }
+
+        .gold {
+            color: #ffd966;
+            font-size: 18px;
+        }
+
+        .kill-counter {
+            color: #ff7777;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>⚔️ DOTA 2 ENCYCLOPEDIA ⚔️</h1>
-        <p>Heroes · Abilities · Iconic Items</p>
+<div class="game-container">
+    <canvas id="gameCanvas" width="1200" height="700"></canvas>
+    <div class="ui-panel">
+        <div class="hero-stats">
+            <div>❤️ HP: <span id="hpValue">0</span></div>
+            <div>⚔️ DMG: <span id="dmgValue">0</span></div>
+            <div>🛡️ ARMOR: <span id="armorValue">0</span></div>
+        </div>
+        <div class="gold">💰 GOLD: <span id="goldValue">500</span></div>
+        <div class="kill-counter">💀 KILLS: <span id="killValue">0</span></div>
+        <div class="inventory" id="inventory"></div>
     </div>
-
-    <div class="tabs">
-        <button class="tab-btn active" data-tab="heroes">HEROES</button>
-        <button class="tab-btn" data-tab="items">ITEMS</button>
+    <div class="shop" id="shopPanel">
+        <h4>🏪 SHOP</h4>
+        <div class="shop-item" data-item="blade">⚔️ Blade of Attack (+12 dmg) - 450g</div>
+        <div class="shop-item" data-item="armor">🛡️ Chainmail (+5 armor) - 550g</div>
+        <div class="shop-item" data-item="health">❤️ Vitality Booster (+200 HP) - 800g</div>
+        <div class="shop-item" data-item="heal">💊 Healing Salve (Heal 150) - 100g</div>
     </div>
-
-    <!-- HEROES PANEL -->
-    <div id="heroesPanel" class="panel active-panel">
-        <div class="section-title">🌟 LEGENDS OF THE BATTLEFIELD</div>
-        <div class="heroes-grid" id="heroesGrid"></div>
-    </div>
-
-    <!-- ITEMS PANEL -->
-    <div id="itemsPanel" class="panel">
-        <div class="section-title">🛡️ MAJOR ITEMS & ARTIFACTS</div>
-        <div class="items-grid" id="itemsGrid"></div>
-    </div>
-    <footer>Data inspired by Dota 2 — All abilities and items reflect classic mechanics. For the Radiant & Dire.</footer>
 </div>
 
 <script>
-    // ---------- HEROES DATA (Luna, Zeus + additional classic heroes) ----------
-    const heroesData = [
-        {
-            name: "Luna",
-            title: "Moon Rider",
-            primary: "Agility",
-            skills: [
-                { name: "Lucent Beam", desc: "Calls a beam of lunar energy to damage an enemy unit. Deals magical damage and mini-stuns.", mana: "90/100/110/120" },
-                { name: "Moon Glaive", desc: "Luna's glaives bounce between enemy units, dealing less damage with each bounce. Great for wave clear.", mana: "Passive" },
-                { name: "Lunar Blessing", desc: "Grants bonus attack damage to allies and increased night vision.", mana: "Passive" },
-                { name: "Eclipse", desc: "Summons multiple Lucent Beams that strike randomly around Luna. Devastating area damage.", mana: "150/200/250" }
-            ]
-        },
-        {
-            name: "Zeus",
-            title: "Lord of Heaven",
-            primary: "Intelligence",
-            skills: [
-                { name: "Arc Lightning", desc: "Hurls a bolt of lightning that jumps between enemies, dealing damage.", mana: "80/90/100/110" },
-                { name: "Lightning Bolt", desc: "Strikes a single enemy unit with a bolt of lightning, dealing damage and providing True Sight.", mana: "100/115/130/145" },
-                { name: "Static Field", desc: "Whenever Zeus casts a spell, enemies around him take damage based on their current health.", mana: "Passive" },
-                { name: "Thundergod's Wrath", desc: "Global lightning strike hits every enemy hero on the map, revealing them and dealing damage.", mana: "225/325/450" }
-            ]
-        },
-        {
-            name: "Juggernaut",
-            title: "Bladekeeper",
-            primary: "Agility",
-            skills: [
-                { name: "Blade Fury", desc: "Spins with a blade, becoming spell immune and damaging nearby enemies.", mana: "100/105/110/115" },
-                { name: "Healing Ward", desc: "Summons a ward that heals all allied units in an area.", mana: "120/125/130/135" },
-                { name: "Blade Dance", desc: "Gives a chance to deal critical strikes on attacks.", mana: "Passive" },
-                { name: "Omnislash", desc: "Jumps between enemy units, slashing them with bonus damage. Invulnerable during jumps.", mana: "150/200/250" }
-            ]
-        },
-        {
-            name: "Crystal Maiden",
-            title: "Crystal Maiden",
-            primary: "Intelligence",
-            skills: [
-                { name: "Crystal Nova", desc: "Blasts enemy units in a target area with a burst of frost.", mana: "100/120/140/160" },
-                { name: "Frostbite", desc: "Encases an enemy unit in ice, preventing movement and attacking, dealing damage over time.", mana: "115/125/135/145" },
-                { name: "Arcane Aura", desc: "Provides mana regeneration to all allies globally.", mana: "Passive" },
-                { name: "Freezing Field", desc: "Channeled ability that summons icy explosions around Crystal Maiden, slowing and damaging enemies.", mana: "200/300/400" }
-            ]
-        },
-        {
-            name: "Axe",
-            title: "Mogul Khan",
-            primary: "Strength",
-            skills: [
-                { name: "Berserker's Call", desc: "Taunts nearby enemies, forcing them to attack Axe while gaining bonus armor.", mana: "80/90/100/110" },
-                { name: "Battle Hunger", desc: "Enrages an enemy unit, causing damage over time until it kills another unit.", mana: "75/85/95/105" },
-                { name: "Counter Helix", desc: "When attacked, Axe has a chance to spin and damage nearby enemies.", mana: "Passive" },
-                { name: "Culling Blade", desc: "Instantly kills an enemy unit with low health. Grants bonus movement speed to allies.", mana: "60/120/180" }
-            ]
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // ========== GAME CONSTANTS ==========
+    const W = 1200, H = 700;
+    
+    // ========== HERO CLASS ==========
+    class Hero {
+        constructor(x, y, name) {
+            this.x = x;
+            this.y = y;
+            this.name = name;
+            this.maxHp = 750;
+            this.hp = 750;
+            this.baseDmg = 28;
+            this.dmgBonus = 0;
+            this.armor = 3;
+            this.armorBonus = 0;
+            this.speed = 4.2;
+            this.radius = 24;
+            this.attackRange = 95;
+            this.attackCooldown = 0;
+            this.attackSpeed = 0.65; // seconds per attack
+            this.lastAttack = 0;
+            this.gold = 500;
+            this.kills = 0;
+            this.inventory = [null, null, null];
         }
-    ];
 
-    // ---------- MAJOR ITEMS (Mostly iconic / big items) ----------
-    const itemsData = [
-        { name: "Black King Bar", cost: 4050, desc: "Grants Spell Immunity and 100% magic resistance for a duration. Immunity duration decreases with each use.", attr: "+10 Strength, +24 Damage, + Active: Avatar" },
-        { name: "Blink Dagger", cost: 2250, desc: "Teleports your hero up to 1200 units toward a target direction. Disabled by hero damage.", attr: "Active: Blink — essential initiation tool" },
-        { name: "Aghanim's Scepter", cost: 4200, desc: "Upgrades abilities of many heroes, often providing new effects or improvements to ultimates.", attr: "+10 All attributes, +200 Health, +200 Mana. Upgrades spells." },
-        { name: "Manta Style", cost: 4550, desc: "Creates two illusions of your hero and dispels most debuffs. Illusions deal reduced damage.", attr: "+10 Strength, +26 Agility, +10 Intelligence, +8% Movement Speed" },
-        { name: "Butterfly", cost: 4975, desc: "Grants evasion, attack speed, and armor. A premier agility carry item.", attr: "+25 Agility, +30 Attack Speed, +35 Damage, +35% Evasion" },
-        { name: "Daedalus", cost: 5150, desc: "Grants a chance to deal critical strikes for massive physical burst.", attr: "+88 Damage, +30% chance for 225% critical strike" },
-        { name: "Scythe of Vyse", cost: 4825, desc: "Turns an enemy unit into a harmless critter for a few seconds, silencing and muting them.", attr: "+25 Intelligence, +10 Strength, +10 Agility, Active: Hex" },
-        { name: "Heart of Tarrasque", cost: 5050, desc: "Massive health pool and immense health regeneration when out of combat.", attr: "+40 Strength, +400 Health, +10 Health Regen. Active: Regeneration" },
-        { name: "Eul's Scepter of Divinity", cost: 2725, desc: "Cyclones an enemy unit, making them invulnerable for a short duration. Provides movement speed.", attr: "+20 Intelligence, +6 Health Regen, +45 Movement Speed, Active: Cyclone" },
-        { name: "Silver Edge", cost: 5450, desc: "Invisibility on demand, providing bonus damage on break and disabling enemy passives.", attr: "+45 Attack Speed, +40 Damage, +300 Health, Active: Shadow Walk + Break" },
-        { name: "Assault Cuirass", cost: 5125, desc: "Aura armor for allies and armor reduction for enemies, plus attack speed.", attr: "+15 Armor, +35 Attack Speed, Aura: -5 Armor to enemies, +5 Armor to allies" },
-        { name: "Abyssal Blade", cost: 6250, desc: "Provides a reliable stun and high damage, great for melee carries.", attr: "+25 Strength, +10 Intelligence, +25 Damage, Active: Overwhelm (pierces immunity)" }
-    ];
-
-    // Helper to render heroes
-    function renderHeroes() {
-        const heroesGrid = document.getElementById("heroesGrid");
-        if (!heroesGrid) return;
-        heroesGrid.innerHTML = heroesData.map(hero => `
-            <div class="hero-card">
-                <div class="hero-header">
-                    <div class="hero-name">
-                        ${hero.name} <span>${hero.primary}</span>
-                    </div>
-                    <div class="hero-stats">
-                        <span>⚔️ ${hero.title}</span>
-                    </div>
-                </div>
-                <div class="skills-section">
-                    ${hero.skills.map(skill => `
-                        <div class="skill">
-                            <div class="skill-name">
-                                🔥 ${skill.name}
-                                <span class="badge">${skill.mana === "Passive" ? "Passive" : `🟢 ${skill.mana}`}</span>
-                            </div>
-                            <div class="skill-desc">${skill.desc}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function renderItems() {
-        const itemsGrid = document.getElementById("itemsGrid");
-        if (!itemsGrid) return;
-        itemsGrid.innerHTML = itemsData.map(item => `
-            <div class="item-card">
-                <div class="item-name">
-                    🧩 ${item.name}
-                    <span class="item-cost">💰 ${item.cost} gold</span>
-                </div>
-                <div class="item-desc">${item.desc}</div>
-                <div class="item-attr">${item.attr}</div>
-            </div>
-        `).join('');
-    }
-
-    // Tab switching logic
-    function initTabs() {
-        const btns = document.querySelectorAll(".tab-btn");
-        const heroesPanel = document.getElementById("heroesPanel");
-        const itemsPanel = document.getElementById("itemsPanel");
-
-        btns.forEach(btn => {
-            btn.addEventListener("click", () => {
-                const tabId = btn.getAttribute("data-tab");
-                // update active button style
-                btns.forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-
-                // hide both panels
-                if (heroesPanel) heroesPanel.classList.remove("active-panel");
-                if (itemsPanel) itemsPanel.classList.remove("active-panel");
-
-                if (tabId === "heroes") {
-                    if (heroesPanel) heroesPanel.classList.add("active-panel");
-                } else if (tabId === "items") {
-                    if (itemsPanel) itemsPanel.classList.add("active-panel");
+        get totalDmg() { return this.baseDmg + this.dmgBonus; }
+        get totalArmor() { return this.armor + this.armorBonus; }
+        
+        takeDamage(amount) {
+            let physReduction = this.totalArmor * 0.06 / (1 + this.totalArmor * 0.06);
+            let dmgTaken = amount * (1 - physReduction);
+            dmgTaken = Math.max(5, dmgTaken);
+            this.hp -= dmgTaken;
+            if(this.hp <= 0) this.hp = 0;
+            return dmgTaken;
+        }
+        
+        addItem(item) {
+            for(let i=0; i<this.inventory.length; i++) {
+                if(this.inventory[i] === null) {
+                    this.inventory[i] = item;
+                    if(item.effect) item.effect(this);
+                    return true;
                 }
-            });
+            }
+            return false;
+        }
+        
+        useItem(slot) {
+            let item = this.inventory[slot];
+            if(item && item.use) {
+                let used = item.use(this);
+                if(used) this.inventory[slot] = null;
+            }
+        }
+        
+        attackTarget(target) {
+            let now = performance.now() / 1000;
+            if(now - this.lastAttack < this.attackSpeed) return false;
+            let dx = target.x - this.x;
+            let dy = target.y - this.y;
+            let dist = Math.hypot(dx, dy);
+            if(dist < this.attackRange + target.radius) {
+                let dmg = this.totalDmg + Math.floor(Math.random() * 12);
+                let dealt = target.takeDamage(dmg);
+                this.lastAttack = now;
+                return {dealt, target};
+            }
+            return false;
+        }
+        
+        moveToward(tx, ty, allObstacles) {
+            let dx = tx - this.x;
+            let dy = ty - this.y;
+            let len = Math.hypot(dx, dy);
+            if(len > 1) {
+                let move = Math.min(this.speed, len);
+                let stepX = (dx / len) * move;
+                let stepY = (dy / len) * move;
+                let newX = this.x + stepX;
+                let newY = this.y + stepY;
+                // collision with other units (avoid stacking)
+                let collide = false;
+                for(let u of allObstacles) {
+                    if(u === this) continue;
+                    let d = Math.hypot(newX - u.x, newY - u.y);
+                    if(d < this.radius + u.radius) {
+                        collide = true;
+                        break;
+                    }
+                }
+                if(!collide) {
+                    this.x = newX;
+                    this.y = newY;
+                }
+            }
+        }
+        
+        draw() {
+            ctx.save();
+            ctx.shadowBlur = 0;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+            ctx.fillStyle = this.name === "Luna" ? "#b87333" : "#4a90e2";
+            ctx.fill();
+            ctx.strokeStyle = "#e6b422";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.fillStyle = "white";
+            ctx.font = "bold 16px Arial";
+            ctx.fillText(this.name, this.x-20, this.y-28);
+            ctx.fillStyle = "#ff5555";
+            ctx.fillRect(this.x-25, this.y-32, 50, 6);
+            ctx.fillStyle = "#55ff55";
+            let hpPercent = this.hp/this.maxHp;
+            ctx.fillRect(this.x-25, this.y-32, 50*hpPercent, 6);
+            ctx.fillStyle = "gold";
+            ctx.font = "12px monospace";
+            ctx.fillText(`⚔️${this.totalDmg} 🛡️${this.totalArmor}`, this.x-22, this.y-38);
+            ctx.restore();
+        }
+    }
+    
+    // ========== CREEP CLASS ==========
+    class Creep {
+        constructor(x, y, team, type) {
+            this.x = x;
+            this.y = y;
+            this.team = team; // "radiant" or "dire"
+            this.type = type;
+            this.maxHp = type === "melee" ? 550 : 400;
+            this.hp = this.maxHp;
+            this.damage = type === "melee" ? 24 : 18;
+            this.radius = 20;
+            this.attackRange = 70;
+            this.attackCooldown = 0;
+            this.lastAttack = 0;
+            this.attackSpeed = 1.0;
+            this.speed = 1.8;
+            this.target = null;
+        }
+        
+        takeDamage(amount) {
+            this.hp -= amount;
+            return amount;
+        }
+        
+        attackTarget(target) {
+            let now = performance.now() / 1000;
+            if(now - this.lastAttack < this.attackSpeed) return false;
+            let dist = Math.hypot(this.x - target.x, this.y - target.y);
+            if(dist < this.attackRange + target.radius) {
+                let dmg = this.damage + Math.floor(Math.random() * 8);
+                target.takeDamage(dmg);
+                this.lastAttack = now;
+                return true;
+            }
+            return false;
+        }
+        
+        moveToward(target, allUnits) {
+            if(!target) return;
+            let dx = target.x - this.x;
+            let dy = target.y - this.y;
+            let len = Math.hypot(dx, dy);
+            if(len > 5) {
+                let move = Math.min(this.speed, len-5);
+                let stepX = (dx/len)*move;
+                let stepY = (dy/len)*move;
+                let newX = this.x+stepX;
+                let newY = this.y+stepY;
+                let collide = false;
+                for(let u of allUnits) {
+                    if(u===this) continue;
+                    if(Math.hypot(newX-u.x, newY-u.y) < this.radius+u.radius) {
+                        collide=true; break;
+                    }
+                }
+                if(!collide) {
+                    this.x=newX;
+                    this.y=newY;
+                }
+            }
+        }
+        
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+            ctx.fillStyle = this.team === "radiant" ? "#6fbf4c" : "#b84c4c";
+            ctx.fill();
+            ctx.strokeStyle = "#333";
+            ctx.stroke();
+            ctx.fillStyle = "white";
+            ctx.font = "10px Arial";
+            ctx.fillText(this.type==="melee"?"👊":"🏹", this.x-8, this.y-8);
+            ctx.fillStyle = "#ff8888";
+            ctx.fillRect(this.x-15, this.y-18, 30, 4);
+            ctx.fillStyle = "#88ff88";
+            ctx.fillRect(this.x-15, this.y-18, 30*(this.hp/this.maxHp), 4);
+        }
+    }
+    
+    // ========== ITEMS ==========
+    const itemsDB = {
+        blade: { name:"Blade", effect:(h)=> h.dmgBonus+=12, desc:"+12 dmg" },
+        armor: { name:"Armor", effect:(h)=> h.armorBonus+=5, desc:"+5 armor" },
+        health: { name:"Vitality", effect:(h)=> { h.maxHp+=200; h.hp+=200; }, desc:"+200 HP" },
+        heal: { name:"Salve", use:(h)=> { if(h.hp+150 <= h.maxHp) h.hp+=150; else h.hp=h.maxHp; return true; }, desc:"Heal 150" }
+    };
+    
+    // ========== GLOBAL STATE ==========
+    let hero = new Hero(W/2, H/2, "Luna");
+    let enemies = []; // bot heroes
+    let creeps = [];
+    let gameTime = 0;
+    let spawnCounter = 0;
+    let mouseX = hero.x, mouseY = hero.y;
+    let rightClick = false;
+    
+    // enemy bots: Zeus
+    let enemyHero = new Hero(1000, 500, "Zeus");
+    enemyHero.maxHp = 720;
+    enemyHero.hp = 720;
+    enemyHero.baseDmg = 30;
+    enemyHero.team = "dire";
+    enemies.push(enemyHero);
+    
+    // second bot: Juggernaut
+    let enemyHero2 = new Hero(1050, 350, "Juggernaut");
+    enemyHero2.maxHp = 780;
+    enemyHero2.hp = 780;
+    enemyHero2.baseDmg = 32;
+    enemyHero2.team = "dire";
+    enemies.push(enemyHero2);
+    
+    // ========== HELPER FUNCTIONS ==========
+    function spawnCreeps() {
+        creeps.push(new Creep(200, 200, "radiant", "melee"));
+        creeps.push(new Creep(230, 270, "radiant", "ranged"));
+        creeps.push(new Creep(1000, 550, "dire", "melee"));
+        creeps.push(new Creep(1050, 600, "dire", "ranged"));
+        creeps.push(new Creep(970, 500, "dire", "melee"));
+        creeps.push(new Creep(180, 150, "radiant", "melee"));
+    }
+    
+    function updateUI() {
+        document.getElementById("hpValue").innerText = Math.floor(hero.hp)+"/"+hero.maxHp;
+        document.getElementById("dmgValue").innerText = hero.totalDmg;
+        document.getElementById("armorValue").innerText = hero.totalArmor;
+        document.getElementById("goldValue").innerText = Math.floor(hero.gold);
+        document.getElementById("killValue").innerText = hero.kills;
+        
+        let invDiv = document.getElementById("inventory");
+        invDiv.innerHTML = "";
+        for(let i=0; i<hero.inventory.length; i++) {
+            let item = hero.inventory[i];
+            let slotDiv = document.createElement("div");
+            slotDiv.className = "inv-slot";
+            slotDiv.innerText = item ? item.name : "Empty";
+            slotDiv.onclick = (function(idx){ return function(){ hero.useItem(idx); updateUI(); }; })(i);
+            invDiv.appendChild(slotDiv);
+        }
+    }
+    
+    // AI for enemy heroes
+    function updateEnemyAI() {
+        for(let e of enemies) {
+            let distToHero = Math.hypot(e.x - hero.x, e.y - hero.y);
+            if(distToHero < 280) {
+                e.moveToward(hero.x, hero.y, [...enemies, hero, ...creeps]);
+                let attack = e.attackTarget(hero);
+                if(attack && hero.hp <= 0) {
+                    // hero dead
+                }
+            } else {
+                // patrol / move toward lane
+                let targetCreep = creeps.find(c => c.team === "radiant" && Math.hypot(c.x-e.x, c.y-e.y) < 400);
+                if(targetCreep) e.moveToward(targetCreep.x, targetCreep.y, [...enemies, hero, ...creeps]);
+                else e.moveToward(400, 350, [...enemies, hero, ...creeps]);
+            }
+            // attack creeps
+            for(let c of creeps) {
+                if(c.team !== e.team && Math.hypot(e.x-c.x, e.y-c.y) < e.attackRange+20) {
+                    e.attackTarget(c);
+                    break;
+                }
+            }
+        }
+    }
+    
+    function updateCreeps() {
+        for(let i=0; i<creeps.length; i++) {
+            let c = creeps[i];
+            let target = null;
+            if(c.team === "radiant") {
+                // find nearest dire unit
+                let enemiesNear = [...enemies, ...creeps.filter(cr=>cr.team==="dire")];
+                let closest = null;
+                let minDist = 500;
+                for(let t of enemiesNear) {
+                    let d = Math.hypot(c.x-t.x, c.y-t.y);
+                    if(d < minDist) { minDist=d; closest=t; }
+                }
+                target = closest;
+            } else {
+                let enemiesNear = [hero, ...creeps.filter(cr=>cr.team==="radiant")];
+                let closest = null;
+                let minDist = 500;
+                for(let t of enemiesNear) {
+                    let d = Math.hypot(c.x-t.x, c.y-t.y);
+                    if(d < minDist) { minDist=d; closest=t; }
+                }
+                target = closest;
+            }
+            if(target) {
+                c.moveToward(target, [...creeps, hero, ...enemies]);
+                c.attackTarget(target);
+            } else {
+                // move towards enemy base
+                if(c.team === "radiant") c.moveToward(900, 500, [...creeps, hero, ...enemies]);
+                else c.moveToward(300, 300, [...creeps, hero, ...enemies]);
+            }
+        }
+    }
+    
+    function handleCombatAndGold() {
+        // hero attacks with mouse click
+        if(rightClick) {
+            let closestEnemy = null;
+            let minD = hero.attackRange+30;
+            for(let e of enemies) {
+                let d = Math.hypot(hero.x-e.x, hero.y-e.y);
+                if(d < minD) { minD = d; closestEnemy = e; }
+            }
+            for(let c of creeps) {
+                if(c.team !== "radiant") {
+                    let d = Math.hypot(hero.x-c.x, hero.y-c.y);
+                    if(d < minD) { minD = d; closestEnemy = c; }
+                }
+            }
+            if(closestEnemy) hero.attackTarget(closestEnemy);
+            rightClick = false;
+        }
+        
+        // creep death & gold
+        for(let i=0; i<creeps.length; i++) {
+            let c = creeps[i];
+            if(c.hp <= 0) {
+                let killer = null;
+                if(Math.hypot(hero.x-c.x, hero.y-c.y) < 150) killer = hero;
+                for(let e of enemies) if(Math.hypot(e.x-c.x, e.y-c.y) < 150) killer = e;
+                if(killer === hero) {
+                    hero.gold += (c.type==="melee"? 45 : 35);
+                    updateUI();
+                }
+                creeps.splice(i,1);
+                i--;
+            }
+        }
+        // enemy hero death
+        for(let i=0; i<enemies.length; i++) {
+            let e = enemies[i];
+            if(e.hp <= 0) {
+                if(Math.hypot(hero.x-e.x, hero.y-e.y) < 200) {
+                    hero.gold += 220;
+                    hero.kills++;
+                    updateUI();
+                }
+                e.hp = e.maxHp;
+                e.x = 1050 + Math.random()*100;
+                e.y = 400 + Math.random()*200;
+            }
+        }
+        if(hero.hp <= 0) {
+            hero.hp = hero.maxHp;
+            hero.x = 300;
+            hero.y = 350;
+            hero.gold = Math.max(0, hero.gold-100);
+            updateUI();
+        }
+    }
+    
+    function spawnWaveTimer() {
+        spawnCounter++;
+        if(spawnCounter > 300) { // every ~5 seconds at 60fps
+            creeps.push(new Creep(180, 220, "radiant", "melee"));
+            creeps.push(new Creep(220, 280, "radiant", "ranged"));
+            creeps.push(new Creep(1050, 530, "dire", "melee"));
+            creeps.push(new Creep(1010, 580, "dire", "ranged"));
+            spawnCounter = 0;
+        }
+    }
+    
+    // ========== DRAW ==========
+    function drawBackground() {
+        ctx.fillStyle = "#2a5730";
+        ctx.fillRect(0,0,W,H);
+        // lane lines
+        ctx.strokeStyle = "#b8860b";
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(0, H/2);
+        ctx.lineTo(W, H/2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(W/2, 0);
+        ctx.lineTo(W/2, H);
+        ctx.stroke();
+        ctx.fillStyle = "#8b5a2b";
+        ctx.font = "bold 20px Arial";
+        ctx.fillText("🌳 RADIANT BASE", 30, 60);
+        ctx.fillStyle = "#5a2b2b";
+        ctx.fillText("💀 DIRE BASE", W-200, H-40);
+    }
+    
+    function draw() {
+        drawBackground();
+        hero.draw();
+        for(let e of enemies) e.draw();
+        for(let c of creeps) c.draw();
+        
+        // attack range indicator on hover? 
+        ctx.beginPath();
+        ctx.arc(hero.x, hero.y, hero.attackRange, 0, Math.PI*2);
+        ctx.strokeStyle = "#e6b42266";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        
+        // mouse target circle
+        ctx.beginPath();
+        ctx.arc(mouseX, mouseY, 12, 0, Math.PI*2);
+        ctx.fillStyle = "#ffaa33aa";
+        ctx.fill();
+    }
+    
+    // ========== GAME LOOP ==========
+    function updateGame() {
+        // move hero towards mouse on right click (handled via canvas event)
+        let allUnits = [hero, ...enemies, ...creeps];
+        hero.moveToward(mouseX, mouseY, allUnits);
+        updateEnemyAI();
+        updateCreeps();
+        handleCombatAndGold();
+        spawnWaveTimer();
+        updateUI();
+    }
+    
+    function gameLoop() {
+        updateGame();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+    
+    // ========== EVENT HANDLERS ==========
+    canvas.addEventListener("mousemove", (e) => {
+        let rect = canvas.getBoundingClientRect();
+        let scaleX = canvas.width/rect.width;
+        let scaleY = canvas.height/rect.height;
+        let canvasX = (e.clientX - rect.left) * scaleX;
+        let canvasY = (e.clientY - rect.top) * scaleY;
+        mouseX = Math.min(W-20, Math.max(20, canvasX));
+        mouseY = Math.min(H-20, Math.max(20, canvasY));
+    });
+    
+    canvas.addEventListener("click", (e) => {
+        let rect = canvas.getBoundingClientRect();
+        let scaleX = canvas.width/rect.width;
+        let scaleY = canvas.height/rect.height;
+        let canvasX = (e.clientX - rect.left) * scaleX;
+        let canvasY = (e.clientY - rect.top) * scaleY;
+        // check for attack
+        let attacked = false;
+        for(let i=0; i<enemies.length; i++) {
+            let en = enemies[i];
+            let d = Math.hypot(canvasX-en.x, canvasY-en.y);
+            if(d < en.radius+10) {
+                hero.attackTarget(en);
+                attacked = true;
+                break;
+            }
+        }
+        if(!attacked) {
+            for(let c of creeps) {
+                if(c.team !== "radiant") {
+                    let d = Math.hypot(canvasX-c.x, canvasY-c.y);
+                    if(d < c.radius+10) {
+                        hero.attackTarget(c);
+                        break;
+                    }
+                }
+            }
+        }
+    });
+    
+    canvas.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        let rect = canvas.getBoundingClientRect();
+        let scaleX = canvas.width/rect.width;
+        let scaleY = canvas.height/rect.height;
+        let canvasX = (e.clientX - rect.left) * scaleX;
+        let canvasY = (e.clientY - rect.top) * scaleY;
+        mouseX = Math.min(W-20, Math.max(20, canvasX));
+        mouseY = Math.min(H-20, Math.max(20, canvasY));
+        rightClick = true;
+        return false;
+    });
+    
+    // shop handlers
+    document.querySelectorAll(".shop-item").forEach(el => {
+        el.addEventListener("click", () => {
+            let itemId = el.getAttribute("data-item");
+            let item = itemsDB[itemId];
+            let cost = { blade:450, armor:550, health:800, heal:100 }[itemId];
+            if(hero.gold >= cost) {
+                hero.gold -= cost;
+                let newItem = { name: item.name, effect: item.effect, use: item.use };
+                if(itemId === "heal") newItem = { name: item.name, use: item.use };
+                else newItem.effect = item.effect;
+                hero.addItem(newItem);
+                updateUI();
+            }
         });
-    }
-
-    // Initial render + extra safety for dynamic
-    function init() {
-        renderHeroes();
-        renderItems();
-        initTabs();
-    }
-
-    init();
+    });
+    
+    // initial spawn
+    spawnCreeps();
+    updateUI();
+    gameLoop();
 </script>
 </body>
 </html>
