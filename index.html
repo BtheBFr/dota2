@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Dota 2 Encyclopedia — Heroes & Items</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0e1a;
+            font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+            color: #eef2ff;
+            line-height: 1.45;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #e6b422, #c97e1a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+        .header p {
+            color: #8e9aaf;
+            font-size: 1.1rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: #1e2438;
+            border: none;
+            padding: 0.7rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 40px;
+            color: #b9c2db;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .tab-btn.active {
+            background: #e6b422;
+            color: #0a0e1a;
+            box-shadow: 0 4px 12px rgba(230,180,34,0.3);
+        }
+        .tab-btn:hover:not(.active) {
+            background: #2f3a54;
+            color: #ffffff;
+        }
+
+        /* Content panels */
+        .panel {
+            display: none;
+            animation: fade 0.25s ease;
+        }
+        .panel.active-panel {
+            display: block;
+        }
+        @keyframes fade {
+            from { opacity: 0; transform: translateY(6px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* Grids */
+        .heroes-grid, .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.8rem;
+        }
+
+        /* Hero card */
+        .hero-card {
+            background: #131825;
+            border-radius: 28px;
+            overflow: hidden;
+            border: 1px solid #2a3246;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .hero-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 30px rgba(0,0,0,0.4);
+            border-color: #e6b42260;
+        }
+        .hero-header {
+            background: #0f1420;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #2a3246;
+        }
+        .hero-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .hero-name span {
+            background: #e6b42220;
+            color: #e6b422;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: normal;
+        }
+        .hero-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: #9aa3bf;
+        }
+        .skills-section {
+            padding: 1.2rem 1.5rem 1.5rem;
+        }
+        .skill {
+            margin-bottom: 1rem;
+            border-left: 3px solid #e6b422;
+            padding-left: 0.9rem;
+        }
+        .skill-name {
+            font-weight: 700;
+            color: #ffdd88;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .skill-desc {
+            font-size: 0.85rem;
+            color: #cbd5ff;
+            margin-top: 4px;
+        }
+        .skill-mana {
+            font-size: 0.7rem;
+            color: #6c86b0;
+            font-family: monospace;
+        }
+
+        /* Items grid */
+        .item-card {
+            background: #131825;
+            border-radius: 24px;
+            padding: 1.2rem 1.5rem;
+            border: 1px solid #2a3246;
+            transition: 0.2s;
+        }
+        .item-card:hover {
+            border-color: #e6b422;
+            background: #171e2c;
+        }
+        .item-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+        .item-cost {
+            color: #e6b422;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .item-desc {
+            margin-top: 0.7rem;
+            color: #cbd5ff;
+            font-size: 0.9rem;
+        }
+        .item-attr {
+            margin-top: 0.6rem;
+            font-size: 0.75rem;
+            color: #7e8bb0;
+            border-top: 1px solid #262e44;
+            padding-top: 0.6rem;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            border-left: 4px solid #e6b422;
+            padding-left: 1rem;
+        }
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            color: #5f6c8f;
+            font-size: 0.8rem;
+            border-top: 1px solid #1e2438;
+        }
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .hero-name { font-size: 1.4rem; }
+            .heroes-grid, .items-grid { grid-template-columns: 1fr; }
+        }
+        .badge {
+            background: #1e2438;
+            border-radius: 20px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⚔️ DOTA 2 ENCYCLOPEDIA ⚔️</h1>
+        <p>Heroes · Abilities · Iconic Items</p>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="heroes">HEROES</button>
+        <button class="tab-btn" data-tab="items">ITEMS</button>
+    </div>
+
+    <!-- HEROES PANEL -->
+    <div id="heroesPanel" class="panel active-panel">
+        <div class="section-title">🌟 LEGENDS OF THE BATTLEFIELD</div>
+        <div class="heroes-grid" id="heroesGrid"></div>
+    </div>
+
+    <!-- ITEMS PANEL -->
+    <div id="itemsPanel" class="panel">
+        <div class="section-title">🛡️ MAJOR ITEMS & ARTIFACTS</div>
+        <div class="items-grid" id="itemsGrid"></div>
+    </div>
+    <footer>Data inspired by Dota 2 — All abilities and items reflect classic mechanics. For the Radiant & Dire.</footer>
+</div>
+
+<script>
+    // ---------- HEROES DATA (Luna, Zeus + additional classic heroes) ----------
+    const heroesData = [
+        {
+            name: "Luna",
+            title: "Moon Rider",
+            primary: "Agility",
+            skills: [
+                { name: "Lucent Beam", desc: "Calls a beam of lunar energy to damage an enemy unit. Deals magical damage and mini-stuns.", mana: "90/100/110/120" },
+                { name: "Moon Glaive", desc: "Luna's glaives bounce between enemy units, dealing less damage with each bounce. Great for wave clear.", mana: "Passive" },
+                { name: "Lunar Blessing", desc: "Grants bonus attack damage to allies and increased night vision.", mana: "Passive" },
+                { name: "Eclipse", desc: "Summons multiple Lucent Beams that strike randomly around Luna. Devastating area damage.", mana: "150/200/250" }
+            ]
+        },
+        {
+            name: "Zeus",
+            title: "Lord of Heaven",
+            primary: "Intelligence",
+            skills: [
+                { name: "Arc Lightning", desc: "Hurls a bolt of lightning that jumps between enemies, dealing damage.", mana: "80/90/100/110" },
+                { name: "Lightning Bolt", desc: "Strikes a single enemy unit with a bolt of lightning, dealing damage and providing True Sight.", mana: "100/115/130/145" },
+                { name: "Static Field", desc: "Whenever Zeus casts a spell, enemies around him take damage based on their current health.", mana: "Passive" },
+                { name: "Thundergod's Wrath", desc: "Global lightning strike hits every enemy hero on the map, revealing them and dealing damage.", mana: "225/325/450" }
+            ]
+        },
+        {
+            name: "Juggernaut",
+            title: "Bladekeeper",
+            primary: "Agility",
+            skills: [
+                { name: "Blade Fury", desc: "Spins with a blade, becoming spell immune and damaging nearby enemies.", mana: "100/105/110/115" },
+                { name: "Healing Ward", desc: "Summons a ward that heals all allied units in an area.", mana: "120/125/130/135" },
+                { name: "Blade Dance", desc: "Gives a chance to deal critical strikes on attacks.", mana: "Passive" },
+                { name: "Omnislash", desc: "Jumps between enemy units, slashing them with bonus damage. Invulnerable during jumps.", mana: "150/200/250" }
+            ]
+        },
+        {
+            name: "Crystal Maiden",
+            title: "Crystal Maiden",
+            primary: "Intelligence",
+            skills: [
+                { name: "Crystal Nova", desc: "Blasts enemy units in a target area with a burst of frost.", mana: "100/120/140/160" },
+                { name: "Frostbite", desc: "Encases an enemy unit in ice, preventing movement and attacking, dealing damage over time.", mana: "115/125/135/145" },
+                { name: "Arcane Aura", desc: "Provides mana regeneration to all allies globally.", mana: "Passive" },
+                { name: "Freezing Field", desc: "Channeled ability that summons icy explosions around Crystal Maiden, slowing and damaging enemies.", mana: "200/300/400" }
+            ]
+        },
+        {
+            name: "Axe",
+            title: "Mogul Khan",
+            primary: "Strength",
+            skills: [
+                { name: "Berserker's Call", desc: "Taunts nearby enemies, forcing them to attack Axe while gaining bonus armor.", mana: "80/90/100/110" },
+                { name: "Battle Hunger", desc: "Enrages an enemy unit, causing damage over time until it kills another unit.", mana: "75/85/95/105" },
+                { name: "Counter Helix", desc: "When attacked, Axe has a chance to spin and damage nearby enemies.", mana: "Passive" },
+                { name: "Culling Blade", desc: "Instantly kills an enemy unit with low health. Grants bonus movement speed to allies.", mana: "60/120/180" }
+            ]
+        }
+    ];
+
+    // ---------- MAJOR ITEMS (Mostly iconic / big items) ----------
+    const itemsData = [
+        { name: "Black King Bar", cost: 4050, desc: "Grants Spell Immunity and 100% magic resistance for a duration. Immunity duration decreases with each use.", attr: "+10 Strength, +24 Damage, + Active: Avatar" },
+        { name: "Blink Dagger", cost: 2250, desc: "Teleports your hero up to 1200 units toward a target direction. Disabled by hero damage.", attr: "Active: Blink — essential initiation tool" },
+        { name: "Aghanim's Scepter", cost: 4200, desc: "Upgrades abilities of many heroes, often providing new effects or improvements to ultimates.", attr: "+10 All attributes, +200 Health, +200 Mana. Upgrades spells." },
+        { name: "Manta Style", cost: 4550, desc: "Creates two illusions of your hero and dispels most debuffs. Illusions deal reduced damage.", attr: "+10 Strength, +26 Agility, +10 Intelligence, +8% Movement Speed" },
+        { name: "Butterfly", cost: 4975, desc: "Grants evasion, attack speed, and armor. A premier agility carry item.", attr: "+25 Agility, +30 Attack Speed, +35 Damage, +35% Evasion" },
+        { name: "Daedalus", cost: 5150, desc: "Grants a chance to deal critical strikes for massive physical burst.", attr: "+88 Damage, +30% chance for 225% critical strike" },
+        { name: "Scythe of Vyse", cost: 4825, desc: "Turns an enemy unit into a harmless critter for a few seconds, silencing and muting them.", attr: "+25 Intelligence, +10 Strength, +10 Agility, Active: Hex" },
+        { name: "Heart of Tarrasque", cost: 5050, desc: "Massive health pool and immense health regeneration when out of combat.", attr: "+40 Strength, +400 Health, +10 Health Regen. Active: Regeneration" },
+        { name: "Eul's Scepter of Divinity", cost: 2725, desc: "Cyclones an enemy unit, making them invulnerable for a short duration. Provides movement speed.", attr: "+20 Intelligence, +6 Health Regen, +45 Movement Speed, Active: Cyclone" },
+        { name: "Silver Edge", cost: 5450, desc: "Invisibility on demand, providing bonus damage on break and disabling enemy passives.", attr: "+45 Attack Speed, +40 Damage, +300 Health, Active: Shadow Walk + Break" },
+        { name: "Assault Cuirass", cost: 5125, desc: "Aura armor for allies and armor reduction for enemies, plus attack speed.", attr: "+15 Armor, +35 Attack Speed, Aura: -5 Armor to enemies, +5 Armor to allies" },
+        { name: "Abyssal Blade", cost: 6250, desc: "Provides a reliable stun and high damage, great for melee carries.", attr: "+25 Strength, +10 Intelligence, +25 Damage, Active: Overwhelm (pierces immunity)" }
+    ];
+
+    // Helper to render heroes
+    function renderHeroes() {
+        const heroesGrid = document.getElementById("heroesGrid");
+        if (!heroesGrid) return;
+        heroesGrid.innerHTML = heroesData.map(hero => `
+            <div class="hero-card">
+                <div class="hero-header">
+                    <div class="hero-name">
+                        ${hero.name} <span>${hero.primary}</span>
+                    </div>
+                    <div class="hero-stats">
+                        <span>⚔️ ${hero.title}</span>
+                    </div>
+                </div>
+                <div class="skills-section">
+                    ${hero.skills.map(skill => `
+                        <div class="skill">
+                            <div class="skill-name">
+                                🔥 ${skill.name}
+                                <span class="badge">${skill.mana === "Passive" ? "Passive" : `🟢 ${skill.mana}`}</span>
+                            </div>
+                            <div class="skill-desc">${skill.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderItems() {
+        const itemsGrid = document.getElementById("itemsGrid");
+        if (!itemsGrid) return;
+        itemsGrid.innerHTML = itemsData.map(item => `
+            <div class="item-card">
+                <div class="item-name">
+                    🧩 ${item.name}
+                    <span class="item-cost">💰 ${item.cost} gold</span>
+                </div>
+                <div class="item-desc">${item.desc}</div>
+                <div class="item-attr">${item.attr}</div>
+            </div>
+        `).join('');
+    }
+
+    // Tab switching logic
+    function initTabs() {
+        const btns = document.querySelectorAll(".tab-btn");
+        const heroesPanel = document.getElementById("heroesPanel");
+        const itemsPanel = document.getElementById("itemsPanel");
+
+        btns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const tabId = btn.getAttribute("data-tab");
+                // update active button style
+                btns.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+
+                // hide both panels
+                if (heroesPanel) heroesPanel.classList.remove("active-panel");
+                if (itemsPanel) itemsPanel.classList.remove("active-panel");
+
+                if (tabId === "heroes") {
+                    if (heroesPanel) heroesPanel.classList.add("active-panel");
+                } else if (tabId === "items") {
+                    if (itemsPanel) itemsPanel.classList.add("active-panel");
+                }
+            });
+        });
+    }
+
+    // Initial render + extra safety for dynamic
+    function init() {
+        renderHeroes();
+        renderItems();
+        initTabs();
+    }
+
+    init();
+</script>
+</body>
+</html>
